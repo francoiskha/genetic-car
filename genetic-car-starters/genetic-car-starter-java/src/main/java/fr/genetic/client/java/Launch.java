@@ -54,13 +54,14 @@ public class Launch implements CommandLineRunner {
     protected void doMyAlgo() {
 
         for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
+            System.out.println("Itération "+nbSteps);
             creation();
             evaluation();
             selection();
-            croisement();
+            //croisement();
+            croisementBis();
             mutation();
 
-            report(nbSteps);
 
             prepareIterationSuivante();
 
@@ -99,16 +100,10 @@ public class Launch implements CommandLineRunner {
     void selection() { // selection et croisement plusieurs itérations possibles
 
         List<CarScoreView> sortedCars =  carsEvaluated.stream()
-                .sorted((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
+                .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
-
-
-        CarScoreView champion = carsEvaluated.stream()
-                .max((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
-                .get();
-        carsSelected=new ArrayList<CarScoreView>();
-        carsSelected.add(champion);
+        carsSelected = sortedCars.subList(0, 6);
 
     };
 
@@ -128,6 +123,40 @@ public class Launch implements CommandLineRunner {
         carsCroised=croises;
     }
 
+    void croisementBis() {
+        List<CarScoreView> premiereMoitie = carsEvaluated.subList(0, carsEvaluated.size()/2);
+        List<CarScoreView> secondeMoitie = carsEvaluated.subList(carsEvaluated.size()/2,carsEvaluated.size());
+
+        List<CarScoreView> croises = new ArrayList<CarScoreView>();
+
+        for (int i = 0; i < carsEvaluated.size()/2;i++){
+
+            double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0,100));
+
+            CarView croise = premiereMoitie.get(i).car;
+            CarView autreParent = secondeMoitie.get(i).car;
+
+            if (selRange < 33) {
+                //Roue 1
+                croise.wheel1 = autreParent.wheel1;
+
+            } else if (selRange < 66) {
+                //Roue 2
+                croise.wheel2 = autreParent.wheel2;
+
+            } else {
+                // Roue 3
+                croise.chassis = autreParent.chassis;
+
+            }
+
+            CarScoreView result = new CarScoreView();
+            result.car = croise;
+            croises.add(result);
+        }
+        carsCroised=croises;
+    }
+
     // Met à jour carMutated
     void  mutation() {
 
@@ -138,7 +167,7 @@ public class Launch implements CommandLineRunner {
     }
 
     private CarScoreView mutateCarScoreView(int probaMutation, CarScoreView carScoreView) {
-        double txMutation = 5;
+        double txMutation = 25;
 
         if (probaMutation < txMutation ) {
 
@@ -170,13 +199,6 @@ public class Launch implements CommandLineRunner {
         }
     }
 
-    void report(int iteration) {
-        System.out.println("Rapport de l'itération "+iteration);
-        carsSelected.stream().map(carScoreView -> {
-            System.out.print(carScoreView.score+",");
-            return null;
-        });
 
-    }
 
 }
