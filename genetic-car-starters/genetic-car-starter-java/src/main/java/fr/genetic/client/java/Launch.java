@@ -54,13 +54,13 @@ public class Launch implements CommandLineRunner {
     protected void doMyAlgo() {
         creation();
         for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
-            System.out.println("Itération "+nbSteps);
+            System.out.println("Itération " + nbSteps);
             evaluation();
             selection();
             //croisement();
             croisementBis();
             mutation();
-
+            report(nbSteps);
             prepareIterationSuivante();
 
         }
@@ -134,7 +134,7 @@ public class Launch implements CommandLineRunner {
 
         for (int i = 0; i < carsEvaluated.size()/2;i++){
 
-            double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0,100));
+            double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0, 100));
 
             CarView croise = premiereMoitie.get(i).car;
             CarView autreParent = secondeMoitie.get(i).car;
@@ -210,4 +210,14 @@ public class Launch implements CommandLineRunner {
         carsViewCreated.clear();
         carsViewCreated = carsCreated.stream().map(Car::toCarView).collect(Collectors.toList());
     }
+
+    void report(int i) {
+        System.out.println("itération " + i);
+        for (CarScoreView csv : carsSelected) {
+            System.out.print(csv.score+",");
+        }
+        System.out.println();
+
+    }
+
 }
