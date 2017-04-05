@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -92,6 +93,13 @@ public class Launch implements CommandLineRunner {
 
     // Met à jour carsSelected;
     void selection() { // selection et croisement plusieurs itérations possibles
+
+        List<CarScoreView> sortedCars =  carsEvaluated.stream()
+                .sorted((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
+                .collect(Collectors.toList());
+
+
+
         CarScoreView champion = carsEvaluated.stream()
                 .max((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
                 .get();
@@ -107,8 +115,30 @@ public class Launch implements CommandLineRunner {
 
     // Met à jour carMutated
     void  mutation() {
+
+        Random ran = new Random(System.currentTimeMillis());
+        carsCroised.stream().map(carScoreView -> mutateCarScoreView(ran.nextInt(100), carScoreView)).collect(Collectors.toList());
+
         carsMutated=carsCroised;
     }
 
+    private CarScoreView mutateCarScoreView(int probaMutation, CarScoreView carScoreView) {
+        double txMutation = 5;
+
+        if (probaMutation < txMutation ) {
+
+            Car mutationElement = Car.random();
+            Random ran = new Random(System.currentTimeMillis());
+            int target = ran.nextInt(22);
+
+            Car rawMutatedCar = Car.createFrom(carScoreView.car);
+
+            rawMutatedCar.coords[target] = mutationElement.coords[target];
+            carScoreView.car = rawMutatedCar.toCarView();
+        }
+
+        return carScoreView;
+
+    }
 
 }
