@@ -112,7 +112,7 @@ public class Launch implements CommandLineRunner {
                 .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
-        carsSelected = sortedCars.subList(0, 6);
+        carsSelected = sortedCars.subList(0, 8);
 
     };
 
@@ -200,9 +200,9 @@ public class Launch implements CommandLineRunner {
         carsCreated=new ArrayList<Car>();
         carsCreated.addAll(carsSelected.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
         System.out.println("Cars Created  suivante : " + carsCreated.size());
-        carsCreated.addAll(carsCroised.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 8
+        carsCreated.addAll(carsCroised.subList(0, 4).stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 4
         System.out.println("Cars Created croised suivante : " + carsCreated.size());
-        carsCreated.addAll(carsMutated.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        carsCreated.addAll(carsMutated.subList(0, 4).stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
         System.out.println("Cars Created mutated suivante : " + carsCreated.size());
 
         // Génération de 4 randoms
