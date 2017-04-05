@@ -98,13 +98,7 @@ public class Launch implements CommandLineRunner {
                 .sorted((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
-
-
-        CarScoreView champion = carsEvaluated.stream()
-                .max((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
-                .get();
-        carsSelected=new ArrayList<CarScoreView>();
-        carsSelected.add(champion);
+        carsSelected = sortedCars.subList(0, 6);
 
     };
 
