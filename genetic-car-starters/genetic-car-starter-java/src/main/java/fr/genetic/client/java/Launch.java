@@ -70,7 +70,7 @@ public class Launch implements CommandLineRunner {
             System.out.println("- " + carsCreated.size() + " préparés pour l'étape suivante");
 
         }
-
+        evaluation();
         LOGGER.info("Mon champion est {}", carsSelected.get(0));
     }
 
