@@ -118,7 +118,7 @@ public class Launch implements CommandLineRunner {
             result.car = croise.toCarView();
             croises.add(result);
         }
-        carsCroised=carsEvaluated;
+        carsCroised=croises;
     }
 
     // Met à jour carMutated
