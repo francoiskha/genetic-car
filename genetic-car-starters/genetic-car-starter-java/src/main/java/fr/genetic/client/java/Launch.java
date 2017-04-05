@@ -54,12 +54,13 @@ public class Launch implements CommandLineRunner {
     protected void doMyAlgo() {
 
         for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
-            System.out.println("Itération "+nbSteps);
             creation();
             evaluation();
             selection();
             croisement();
             mutation();
+
+            report(nbSteps);
 
             prepareIterationSuivante();
 
@@ -168,4 +169,14 @@ public class Launch implements CommandLineRunner {
             carsCreated.add(c);
         }
     }
+
+    void report(int iteration) {
+        System.out.println("Rapport de l'itération "+iteration);
+        carsSelected.stream().map(carScoreView -> {
+            System.out.print(carScoreView.score+",");
+            return null;
+        });
+
+    }
+
 }
