@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -32,7 +33,7 @@ public class Launch implements CommandLineRunner {
     @Autowired
     private RestTemplate restTemplate;
 
-    private Team team = Team.BLUE;
+    private Team team = Team.RED;
 
 
     public static void main(String[] args) {
@@ -47,25 +48,67 @@ public class Launch implements CommandLineRunner {
             LOGGER.error(restException.getMessage());
         }
     }
-
-    private List<CarScoreView> evaluate(List<CarView> cars) {
-        String url = host + "/simulation/evaluate/" + team.name();
-        return restTemplate.exchange(url, HttpMethod.POST,
-                new HttpEntity(cars), new ParameterizedTypeReference<List<CarScoreView>>() {}).getBody();
-    }
+    int MAX_STEPS=5;
 
     protected void doMyAlgo() {
-        List<CarView> cars = IntStream.range(0, 20)
-                .mapToObj(i -> Car.random().toCarView())
-                .collect(Collectors.toList());
 
-        List<CarScoreView> carScores = evaluate(cars);
+        for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
+            System.out.println("Itération "+nbSteps);
+            creation();
+            evaluation();
+            selection();
+            croisement();
+            mutation();
+        }
 
-        CarScoreView champion = carScores.stream()
+        LOGGER.info("Mon champion est {}", carsSelected.get(0));
+    }
+
+    List<Car> carsCreated;
+    List<CarView> carsViewCreated;
+    List<CarScoreView> carsEvaluated;
+    List<CarScoreView> carsSelected;
+    List<CarScoreView> carsCroised;
+    List<CarScoreView> carsMutated;
+
+    // Met à jour carsCreated;
+    void creation() {
+        carsCreated=new ArrayList<Car>();
+        carsViewCreated=new ArrayList<CarView>();
+
+        for (int i=0;i<20;i++) {
+            Car c= Car.random();
+            carsCreated.add(c);
+            carsViewCreated.add(c.toCarView());
+        }
+    }
+
+    // Met à jour carsEvaluated;
+    void evaluation() {
+        String url = host + "/simulation/evaluate/" + team.name();
+        carsEvaluated= restTemplate.exchange(url, HttpMethod.POST,
+                new HttpEntity(carsViewCreated), new ParameterizedTypeReference<List<CarScoreView>>() {}).getBody();
+    }
+
+    // Met à jour carsSelected;
+    void selection() { // selection et croisement plusieurs itérations possibles
+        CarScoreView champion = carsEvaluated.stream()
                 .max((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
                 .get();
+        carsSelected=new ArrayList<CarScoreView>();
+        carsSelected.add(champion);
 
-        LOGGER.info("Mon champion est {}", champion);
+    };
+
+    // Met à jour carCroised
+    void croisement() {
+        carsCroised=carsSelected;
     }
+
+    // Met à jour carMutated
+    void  mutation() {
+        carsMutated=carsCroised;
+    }
+
 
 }
