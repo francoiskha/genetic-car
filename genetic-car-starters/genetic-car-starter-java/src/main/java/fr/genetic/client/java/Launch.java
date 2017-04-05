@@ -58,8 +58,10 @@ public class Launch implements CommandLineRunner {
             creation();
             evaluation();
             selection();
-            croisement();
+            //croisement();
+            croisementBis();
             mutation();
+
 
             prepareIterationSuivante();
 
@@ -121,6 +123,40 @@ public class Launch implements CommandLineRunner {
         carsCroised=croises;
     }
 
+    void croisementBis() {
+        List<CarScoreView> premiereMoitie = carsEvaluated.subList(0, carsEvaluated.size()/2);
+        List<CarScoreView> secondeMoitie = carsEvaluated.subList(carsEvaluated.size()/2,carsEvaluated.size());
+
+        List<CarScoreView> croises = new ArrayList<CarScoreView>();
+
+        for (int i = 0; i < carsEvaluated.size()/2;i++){
+
+            double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0,100));
+
+            CarView croise = premiereMoitie.get(i).car;
+            CarView autreParent = secondeMoitie.get(i).car;
+
+            if (selRange < 33) {
+                //Roue 1
+                croise.wheel1 = autreParent.wheel1;
+
+            } else if (selRange < 66) {
+                //Roue 2
+                croise.wheel2 = autreParent.wheel2;
+
+            } else {
+                // Roue 3
+                croise.chassis = autreParent.chassis;
+
+            }
+
+            CarScoreView result = new CarScoreView();
+            result.car = croise;
+            croises.add(result);
+        }
+        carsCroised=croises;
+    }
+
     // Met à jour carMutated
     void  mutation() {
 
@@ -131,7 +167,7 @@ public class Launch implements CommandLineRunner {
     }
 
     private CarScoreView mutateCarScoreView(int probaMutation, CarScoreView carScoreView) {
-        double txMutation = 5;
+        double txMutation = 25;
 
         if (probaMutation < txMutation ) {
 
