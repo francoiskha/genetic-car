@@ -208,15 +208,19 @@ public class Launch implements CommandLineRunner {
         carsCreated=new ArrayList<Car>();
         carsCreated.addAll(carsSelected.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
         System.out.println("Cars Created  suivante : " + carsCreated.size());
-        carsCreated.addAll(carsCroised.subList(0, 4).stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 4
+        carsCreated.addAll(carsCroised.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 4
         System.out.println("Cars Created croised suivante : " + carsCreated.size());
-        carsCreated.addAll(carsMutated.subList(0, 4).stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        carsCreated.addAll(carsMutated.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
         System.out.println("Cars Created mutated suivante : " + carsCreated.size());
 
         // Génération de 4 randoms
         while(carsCreated.size() < 20) {
             Car c = Car.random();
             carsCreated.add(c);
+        }
+
+        if (carsCreated.size() > 0) {
+            carsCreated = carsCreated.subList(0, 20);
         }
 
         System.out.println("Cars Created iteratino suivante : " + carsCreated.size());
