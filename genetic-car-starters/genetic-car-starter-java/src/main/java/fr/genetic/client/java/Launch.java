@@ -118,16 +118,18 @@ public class Launch implements CommandLineRunner {
     // Met à jour carsSelected;
     void selection() { // selection et croisement plusieurs itérations possibles
 
-        int targetScore = 30;
+        int targetScore = 20;
 
         System.out.println("Sorted cars" + carsEvaluated.size());
-
 
         List<CarScoreView> sortedCars =  carsEvaluated.stream()
                 .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
-        carsSelected = sortedCars.stream().filter(carScoreView -> carScoreView.score > targetScore).collect(Collectors.toList());
+        double totalScore = sortedCars.stream().mapToDouble(value -> value.score).sum();
+        System.out.println("Total Score : " + totalScore);
+
+        carsSelected = sortedCars.stream().filter(carScoreView -> (carScoreView.score / targetScore) * 100  > targetScore).collect(Collectors.toList());
 
         CarScoreView first = carsSelected.stream().findFirst().orElse(new CarScoreView()) ;
         if (first.car != null) {
@@ -155,15 +157,32 @@ public class Launch implements CommandLineRunner {
 
     void croisementBis() {
         if (carsSelected.size() > 2) {
-            List<CarScoreView> premiereMoitie = carsSelected.subList(0, carsSelected.size() / 2);
-            List<CarScoreView> secondeMoitie = carsSelected.subList(carsSelected.size() / 2, carsSelected.size());
+
+
+
+            List<CarScoreView> premiereMoitie = new ArrayList<>();
+
+            List<CarScoreView> secondeMoitie = new ArrayList<>();
+
+            int selector = 0;
+            for (CarScoreView csv : carsSelected) {
+
+                if (selector % 2 == 0) {
+                    premiereMoitie.add(csv);
+                } else {
+                    secondeMoitie.add(csv);
+                }
+
+                selector++;
+            }
+
+            carsSelected.subList(carsSelected.size() / 2, carsSelected.size());
 
             List<CarScoreView> croises = new ArrayList<CarScoreView>();
 
             for (int i = 0; i < carsSelected.size() / 2; i++) {
 
                 double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0, 100));
-
 
                 CarView croise = premiereMoitie.get(i).car;
 
