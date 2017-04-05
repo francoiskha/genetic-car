@@ -107,7 +107,18 @@ public class Launch implements CommandLineRunner {
 
     // Met à jour carCroised
     void croisement() {
-        carsCroised=carsSelected;
+        List<CarScoreView> premiereMoitie = carsEvaluated.subList(0, carsEvaluated.size()/2);
+        List<CarScoreView> secondeMoitie = carsEvaluated.subList(carsEvaluated.size()/2,carsEvaluated.size());
+        List<CarScoreView> croises = new ArrayList<CarScoreView>();
+        for (int i = 0; i < carsEvaluated.size()/2;i++){
+            int numeroDeGene = Double.valueOf(Math.floor(fr.genetic.client.java.algo.Random.next(0,22))).intValue();
+            Car croise = Car.createFrom(premiereMoitie.get(0).car);
+            croise.coords[numeroDeGene] = Car.createFrom(secondeMoitie.get(0).car).coords[numeroDeGene];
+            CarScoreView result = new CarScoreView();
+            result.car = croise.toCarView();
+            croises.add(result);
+        }
+        carsCroised=carsEvaluated;
     }
 
     // Met à jour carMutated
