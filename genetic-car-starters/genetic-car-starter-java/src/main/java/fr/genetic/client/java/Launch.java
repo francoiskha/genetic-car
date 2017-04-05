@@ -56,12 +56,18 @@ public class Launch implements CommandLineRunner {
         for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
             System.out.println("Itération " + nbSteps);
             evaluation();
+            System.out.println("- " + carsEvaluated.size() + " evaluated");
             selection();
+            System.out.println("- " + carsSelected.size() + " selected");
             //croisement();
             croisementBis();
+            System.out.println("- " + carsCroised.size() + " croised");
             mutation();
+            System.out.println("- " + carsMutated.size() + " mutated");
+
             report(nbSteps);
             prepareIterationSuivante();
+            System.out.println("- " + carsCreated.size() + " préparés pour l'étape suivante");
 
         }
 
