@@ -102,7 +102,15 @@ public class Launch implements CommandLineRunner {
 
     // Met à jour carCroised
     void croisement() {
-        carsCroised=carsSelected;
+        List<CarScoreView> premiereMoitie = carsEvaluated.subList(0, carsEvaluated.size()/2);
+        List<CarScoreView> secondeMoitie = carsEvaluated.subList(carsEvaluated.size()/2,carsEvaluated.size());
+        List<CarScoreView> croises = new ArrayList<CarScoreView>;
+        for (int i = 0; i < carsEvaluated.size()/2;i++){
+            premiereMoitie[0].
+        }
+        
+        carsCroised=carsEvaluated;
+                
     }
 
     // Met à jour carMutated
