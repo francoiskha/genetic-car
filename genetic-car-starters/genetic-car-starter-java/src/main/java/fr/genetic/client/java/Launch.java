@@ -52,16 +52,14 @@ public class Launch implements CommandLineRunner {
     int MAX_STEPS=5;
 
     protected void doMyAlgo() {
-
+        creation();
         for (int nbSteps = 0; nbSteps < MAX_STEPS ; nbSteps++) {
             System.out.println("Itération "+nbSteps);
-            creation();
             evaluation();
             selection();
             //croisement();
             croisementBis();
             mutation();
-
 
             prepareIterationSuivante();
 
@@ -94,6 +92,8 @@ public class Launch implements CommandLineRunner {
         String url = host + "/simulation/evaluate/" + team.name();
         carsEvaluated= restTemplate.exchange(url, HttpMethod.POST,
                 new HttpEntity(carsViewCreated), new ParameterizedTypeReference<List<CarScoreView>>() {}).getBody();
+
+        carsEvaluated.stream().forEach(carScoreView -> System.out.println(carScoreView.toString()));
     }
 
     // Met à jour carsSelected;
@@ -197,6 +197,8 @@ public class Launch implements CommandLineRunner {
             Car c = Car.random();
             carsCreated.add(c);
         }
+        carsViewCreated.clear();
+        carsViewCreated = carsCreated.stream().map(Car::toCarView).collect(Collectors.toList());
     }
 
 
