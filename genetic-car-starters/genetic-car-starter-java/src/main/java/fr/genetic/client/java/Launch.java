@@ -49,7 +49,7 @@ public class Launch implements CommandLineRunner {
             LOGGER.error(restException.getMessage());
         }
     }
-    int MAX_STEPS=5;
+    int MAX_STEPS=50;
 
     protected void doMyAlgo() {
         creation();
@@ -105,6 +105,8 @@ public class Launch implements CommandLineRunner {
     // Met à jour carsSelected;
     void selection() { // selection et croisement plusieurs itérations possibles
 
+        int targetScore = 50;
+
         System.out.println("Sorted cars" + carsEvaluated.size());
 
 
@@ -112,7 +114,7 @@ public class Launch implements CommandLineRunner {
                 .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
-        carsSelected = sortedCars.subList(0, 8);
+        carsSelected = sortedCars.stream().filter(carScoreView -> carScoreView.score > targetScore).collect(Collectors.toList());
 
     };
 
@@ -133,37 +135,43 @@ public class Launch implements CommandLineRunner {
     }
 
     void croisementBis() {
-        List<CarScoreView> premiereMoitie = carsEvaluated.subList(0, carsEvaluated.size()/2);
-        List<CarScoreView> secondeMoitie = carsEvaluated.subList(carsEvaluated.size()/2,carsEvaluated.size());
+        if (carsSelected.size() > 2) {
+            List<CarScoreView> premiereMoitie = carsSelected.subList(0, carsSelected.size() / 2);
+            List<CarScoreView> secondeMoitie = carsSelected.subList(carsSelected.size() / 2, carsSelected.size());
 
-        List<CarScoreView> croises = new ArrayList<CarScoreView>();
+            List<CarScoreView> croises = new ArrayList<CarScoreView>();
 
-        for (int i = 0; i < carsEvaluated.size()/2;i++){
+            for (int i = 0; i < carsEvaluated.size() / 2; i++) {
 
-            double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0, 100));
+                double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0, 100));
 
-            CarView croise = premiereMoitie.get(i).car;
-            CarView autreParent = secondeMoitie.get(i).car;
+                CarView croise = premiereMoitie.get(i).car;
+                CarView autreParent = secondeMoitie.get(i).car;
 
-            if (selRange < 33) {
-                //Roue 1
-                croise.wheel1 = autreParent.wheel1;
+                if (selRange < 33) {
+                    //Roue 1
+                    croise.wheel1 = autreParent.wheel1;
 
-            } else if (selRange < 66) {
-                //Roue 2
-                croise.wheel2 = autreParent.wheel2;
+                } else if (selRange < 66) {
+                    //Roue 2
+                    croise.wheel2 = autreParent.wheel2;
 
-            } else {
-                // Roue 3
-                croise.chassis = autreParent.chassis;
+                } else {
+                    // Roue 3
+                    croise.chassis = autreParent.chassis;
 
+                }
+
+                CarScoreView result = new CarScoreView();
+                result.car = croise;
+                croises.add(result);
             }
 
-            CarScoreView result = new CarScoreView();
-            result.car = croise;
-            croises.add(result);
+            carsCroised = croises;
+        } else {
+            carsCroised = new ArrayList<>();
         }
-        carsCroised=croises;
+
     }
 
     // Met à jour carMutated
@@ -206,7 +214,7 @@ public class Launch implements CommandLineRunner {
         System.out.println("Cars Created mutated suivante : " + carsCreated.size());
 
         // Génération de 4 randoms
-        for (int i=0;i<4;i++) {
+        while(carsCreated.size() < 20) {
             Car c = Car.random();
             carsCreated.add(c);
         }
