@@ -60,6 +60,9 @@ public class Launch implements CommandLineRunner {
             selection();
             croisement();
             mutation();
+
+            prepareIterationSuivante();
+
         }
 
         LOGGER.info("Mon champion est {}", carsSelected.get(0));
@@ -67,10 +70,10 @@ public class Launch implements CommandLineRunner {
 
     List<Car> carsCreated;
     List<CarView> carsViewCreated;
-    List<CarScoreView> carsEvaluated;
-    List<CarScoreView> carsSelected;
-    List<CarScoreView> carsCroised;
-    List<CarScoreView> carsMutated;
+    List<CarScoreView> carsEvaluated; // 20
+    List<CarScoreView> carsSelected; // 8
+    List<CarScoreView> carsCroised; // 4 ( 1 enfant par paire)
+    List<CarScoreView> carsMutated; // 4
 
     // Met à jour carsCreated;
     void creation() {
@@ -135,4 +138,17 @@ public class Launch implements CommandLineRunner {
 
     }
 
+
+    // Prépare le nouveau carsCreated pour l'itération siuvante
+    void prepareIterationSuivante() {
+        carsCreated=new ArrayList<Car>();
+        carsSelected.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 8
+        carsCroised.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 4
+        carsMutated.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 4
+        // Génération de 4 randoms
+        for (int i=0;i<4;i++) {
+            Car c = Car.random();
+            carsCreated.add(c);
+        }
+    }
 }
