@@ -95,7 +95,7 @@ public class Launch implements CommandLineRunner {
     void selection() { // selection et croisement plusieurs itérations possibles
 
         List<CarScoreView> sortedCars =  carsEvaluated.stream()
-                .sorted((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
+                .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
 
         carsSelected = sortedCars.subList(0, 6);
