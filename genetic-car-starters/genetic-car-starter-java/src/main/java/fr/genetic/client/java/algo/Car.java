@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 public class Car {
 
-    private float[] coords = new float[23];
+    public float[] coords = new float[23];
 
     public static Car createFrom(CarView carView) {
         Assert.notNull(carView);
