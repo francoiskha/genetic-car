@@ -71,6 +71,8 @@ public class Launch implements CommandLineRunner {
 
         }
 
+        evaluation();
+
         LOGGER.info("Mon champion est {}", carsSelected.get(0));
     }
 
@@ -96,16 +98,27 @@ public class Launch implements CommandLineRunner {
     // Met à jour carsEvaluated;
     void evaluation() {
         String url = host + "/simulation/evaluate/" + team.name();
-        carsEvaluated= restTemplate.exchange(url, HttpMethod.POST,
-                new HttpEntity(carsViewCreated), new ParameterizedTypeReference<List<CarScoreView>>() {}).getBody();
 
-        carsEvaluated.stream().forEach(carScoreView -> System.out.println(carScoreView.toString()));
+        carsEvaluated = new ArrayList<>();
+
+        while(carsEvaluated.size() == 0) {
+               try {
+                   carsEvaluated = restTemplate.exchange(url, HttpMethod.POST,
+                           new HttpEntity(carsViewCreated), new ParameterizedTypeReference<List<CarScoreView>>() {
+                           }).getBody();
+
+                   carsEvaluated.stream().forEach(carScoreView -> System.out.println(carScoreView.toString()));
+               } catch (Exception e) {
+                   System.out.println("Failed to call, retry");
+               }
+        }
+
     }
 
     // Met à jour carsSelected;
     void selection() { // selection et croisement plusieurs itérations possibles
 
-        int targetScore = 50;
+        int targetScore = 30;
 
         System.out.println("Sorted cars" + carsEvaluated.size());
 
@@ -115,6 +128,12 @@ public class Launch implements CommandLineRunner {
                 .collect(Collectors.toList());
 
         carsSelected = sortedCars.stream().filter(carScoreView -> carScoreView.score > targetScore).collect(Collectors.toList());
+
+        CarScoreView first = carsSelected.stream().findFirst().orElse(new CarScoreView()) ;
+        if (first.car != null) {
+            System.out.println("Champion :");
+            System.out.println(first);
+        }
 
     };
 
@@ -141,29 +160,43 @@ public class Launch implements CommandLineRunner {
 
             List<CarScoreView> croises = new ArrayList<CarScoreView>();
 
-            for (int i = 0; i < carsEvaluated.size() / 2; i++) {
+            for (int i = 0; i < carsSelected.size() / 2; i++) {
 
                 double selRange = Math.floor(fr.genetic.client.java.algo.Random.next(0, 100));
 
+
                 CarView croise = premiereMoitie.get(i).car;
+
+                CarView child = new CarView();
+                child.chassis = new CarView.Chassis();
+                child.chassis.densite = croise.chassis.densite;
+                child.chassis.vecteurs = croise.chassis.vecteurs;
+                child.wheel1.density = croise.wheel1.density;
+                child.wheel1.radius = croise.wheel1.radius;
+                child.wheel1.vertex = croise.wheel1.vertex;
+
+                child.wheel2.density = croise.wheel2.density;
+                child.wheel2.radius = croise.wheel2.radius;
+                child.wheel2.vertex = croise.wheel2.vertex;
+
                 CarView autreParent = secondeMoitie.get(i).car;
 
                 if (selRange < 33) {
                     //Roue 1
-                    croise.wheel1 = autreParent.wheel1;
+                    child.wheel1 = autreParent.wheel1;
 
                 } else if (selRange < 66) {
                     //Roue 2
-                    croise.wheel2 = autreParent.wheel2;
+                    child.wheel2 = autreParent.wheel2;
 
                 } else {
                     // Roue 3
-                    croise.chassis = autreParent.chassis;
+                    child.chassis = autreParent.chassis;
 
                 }
 
                 CarScoreView result = new CarScoreView();
-                result.car = croise;
+                result.car = child;
                 croises.add(result);
             }
 
@@ -184,7 +217,7 @@ public class Launch implements CommandLineRunner {
     }
 
     private CarScoreView mutateCarScoreView(int probaMutation, CarScoreView carScoreView) {
-        double txMutation = 25;
+        double txMutation = 100;
 
         if (probaMutation < txMutation ) {
 
@@ -206,11 +239,11 @@ public class Launch implements CommandLineRunner {
     // Prépare le nouveau carsCreated pour l'itération siuvante
     void prepareIterationSuivante() {
         carsCreated=new ArrayList<Car>();
-        carsCreated.addAll(carsSelected.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        carsCreated.addAll(carsSelected.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()).subList(0, carsSelected.size() > 7 ? 7 : carsSelected.size())); // 8
         System.out.println("Cars Created  suivante : " + carsCreated.size());
-        carsCreated.addAll(carsCroised.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 4
+        carsCreated.addAll(carsCroised.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()).subList(0,carsCroised.size() > 3 ? 3 : carsCroised.size() ));  // 4
         System.out.println("Cars Created croised suivante : " + carsCreated.size());
-        carsCreated.addAll(carsMutated.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        carsCreated.addAll(carsMutated.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()).subList(0, carsMutated.size() > 3 ? 3 : carsMutated.size())); // 8
         System.out.println("Cars Created mutated suivante : " + carsCreated.size());
 
         // Génération de 4 randoms
@@ -223,7 +256,7 @@ public class Launch implements CommandLineRunner {
             carsCreated = carsCreated.subList(0, 20);
         }
 
-        System.out.println("Cars Created iteratino suivante : " + carsCreated.size());
+        System.out.println("Cars Created iteratioo suivante : " + carsCreated.size());
 
         carsViewCreated.clear();
         carsViewCreated = carsCreated.stream().map(Car::toCarView).collect(Collectors.toList());
