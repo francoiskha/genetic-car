@@ -99,6 +99,9 @@ public class Launch implements CommandLineRunner {
     // Met à jour carsSelected;
     void selection() { // selection et croisement plusieurs itérations possibles
 
+        System.out.println("Sorted cars" + carsEvaluated.size());
+
+
         List<CarScoreView> sortedCars =  carsEvaluated.stream()
                 .sorted((carScore1, carScore2) -> -1 * Float.compare(carScore1.score, carScore2.score))
                 .collect(Collectors.toList());
@@ -189,14 +192,21 @@ public class Launch implements CommandLineRunner {
     // Prépare le nouveau carsCreated pour l'itération siuvante
     void prepareIterationSuivante() {
         carsCreated=new ArrayList<Car>();
-        carsSelected.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 8
-        carsCroised.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 4
-        carsMutated.stream().map(carScoreView -> { return carsCreated.add(Car.createFrom(carScoreView.car)); }); // 4
+        carsCreated.addAll(carsSelected.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        System.out.println("Cars Created  suivante : " + carsCreated.size());
+        carsCreated.addAll(carsCroised.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList()));  // 8
+        System.out.println("Cars Created croised suivante : " + carsCreated.size());
+        carsCreated.addAll(carsMutated.stream().map(carScoreView -> Car.createFrom(carScoreView.car)).collect(Collectors.toList())); // 8
+        System.out.println("Cars Created mutated suivante : " + carsCreated.size());
+
         // Génération de 4 randoms
         for (int i=0;i<4;i++) {
             Car c = Car.random();
             carsCreated.add(c);
         }
+
+        System.out.println("Cars Created iteratino suivante : " + carsCreated.size());
+
         carsViewCreated.clear();
         carsViewCreated = carsCreated.stream().map(Car::toCarView).collect(Collectors.toList());
     }
